@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js" ></script>
+  <style type="text/css">
+    *{
+      margin: 0;
+      border: 0;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+    }
+    #root {
+      width: 100%;
+      height: 100%;
+      background-color: lightblue;
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #login-table{
+      justify-content: center;
+
+    }
+
+    input:focus{
+      outline: 2px dashed rgb(183, 214, 99);
+    }
+    #login-table{
+      width: 300px;
+      height: 200px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: rgb(44, 84, 122);
+      
+    }
+    #login-form{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group{
+      flex: 1;
+      padding: 4px 0;
+    }
+    button{
+      border-radius: 3px;
+
+    }
+    button:hover{
+      background-color: olive;
+    }
+  </style>  
+</head>
+<body>
+  <div id="root">
+    <div id="login-table" >
+      <form id="login-form" action="http://ywhabc.com:889/cas/login" >
+        <div class="form-group">
+          Cas Login
+        </div>
+        
+        <div class="form-group">
+          <label for="login-uname" >账号:</label>
+          <input type="text" id="login-uname" placeholder="请输入用户账号" name="username"/>
+        </div>
+
+        <div class="form-group">
+          <label for="login-pwd" >密码:</label>
+          <input type="password" id="login-pwd" placeholder="请输入用户账号" name="password" />
+        </div>
+        <input type="hidden" id="login-service" name="service" />
+        <div class="form-group">
+          <button type="submit" id="login-btn">登录</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script type="text/javascript">
+    
+    // 获得请求中的参数
+    const getParams = () => {
+      const search = location.search;
+      var reg = /(\w+)=([^&]+)/g,
+        params = {},
+        result = null;
+      
+      while ((result = reg.exec(search))) {
+        params[result[1]] = decodeURI(result[2]);
+      }
+      return params;
+    }
+    
+    // 向表单中添加隐含参数
+    const insertHiddenFormParam = () => {
+      const casForm = document.querySelector("#login-service");
+      const pageParam = getParams();
+      if(pageParam && pageParam["service"]){
+        casForm.value = pageParam["service"];
+        // 提示 service 的域名是否合法
+        // if(check(pageParam["service"])) {
+        //! do some thing
+        // }
+      }
+    }
+    insertHiddenFormParam();
+
+    // 检查登录状态
+    const checkLoading = () => {
+      const pageParam = getParams();
+      const service = pageParam["service"] ? pageParam["service"] : "";
+      axios.get("http://ywhabc.com:889/cas/checkLoginState")
+            .then((res) => {
+              console.dir(res)
+              const ticket = res.data["ticket"]
+              // 如果登录成功就页面跳转到系统页面
+              if (res.status === 200) {
+                window.location.href = service + `?ticket=${ticket}`;
+              }
+            })
+            .catch((err) => {
+              console.dir(err)
+            })
+    };
+    checkLoading();
+    
+  </script>
+</body>
+</html>

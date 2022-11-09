@@ -1,0 +1,5 @@
+allowDomain:
+  - ywhlearn.com
+adminUserInfo:
+  name: ywh
+  password: ywh
